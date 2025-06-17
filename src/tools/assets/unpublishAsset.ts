@@ -11,14 +11,14 @@ import {
   waitForBulkActionCompletion,
 } from '../../utils/bulkOperations.js';
 
-export const UnpublishEntryToolParams = BaseToolSchema.extend({
-  entryId: z.union([
+export const UnpublishAssetToolParams = BaseToolSchema.extend({
+  assetId: z.union([
     z.string(),
     z.array(z.string()).max(100)
-  ]).describe('The ID of the entry to unpublish (string) or an array of entry IDs (up to 100 entries)'),
+  ]).describe('The ID of the asset to unpublish (string) or an array of asset IDs (up to 100 assets)'),
 });
 
-type Params = z.infer<typeof UnpublishEntryToolParams>;
+type Params = z.infer<typeof UnpublishAssetToolParams>;
 
 async function tool(args: Params) {
   const baseParams: BulkOperationParams = {
@@ -29,29 +29,29 @@ async function tool(args: Params) {
   const contentfulClient = createToolClient(args);
 
   // Normalize input to always be an array
-  const entryIds = Array.isArray(args.entryId) ? args.entryId : [args.entryId];
+  const assetIds = Array.isArray(args.assetId) ? args.assetId : [args.assetId];
   
-  // For single entry, use individual unpublish for simplicity
-  if (entryIds.length === 1) {
+  // For single asset, use individual unpublish for simplicity
+  if (assetIds.length === 1) {
     try {
-      const entryId = entryIds[0];
+      const assetId = assetIds[0];
       const params = {
         ...baseParams,
-        entryId,
+        assetId,
       };
 
-      // Get the entry first
-      const entry = await contentfulClient.entry.get(params);
+      // Get the asset first
+      const asset = await contentfulClient.asset.get(params);
       
-      // Only unpublish if the entry is currently published
-      if (entry.sys.publishedVersion !== undefined) {
-        // Unpublish the entry
-        await contentfulClient.entry.unpublish(params, entry);
+      // Only unpublish if the asset is currently published
+      if (asset.sys.publishedVersion !== undefined) {
+        // Unpublish the asset
+        await contentfulClient.asset.unpublish(params, asset);
         
-        return createSuccessResponse('Entry unpublished successfully', {
-          unpublishedEntries: [{
-            id: entry.sys.id,
-            contentType: entry.sys.contentType.sys.id,
+        return createSuccessResponse('Asset unpublished successfully', {
+          unpublishedAssets: [{
+            id: asset.sys.id,
+            title: asset.fields.title?.["en-US"] || "Untitled",
             wasPublished: true,
           }],
           errors: [],
@@ -62,11 +62,11 @@ async function tool(args: Params) {
           },
         });
       } else {
-        // Entry was already unpublished
-        return createSuccessResponse('Entry was already unpublished', {
-          unpublishedEntries: [{
-            id: entry.sys.id,
-            contentType: entry.sys.contentType.sys.id,
+        // Asset was already unpublished
+        return createSuccessResponse('Asset was already unpublished', {
+          unpublishedAssets: [{
+            id: asset.sys.id,
+            title: asset.fields.title?.["en-US"] || "Untitled",
             wasPublished: false,
           }],
           errors: [],
@@ -78,10 +78,10 @@ async function tool(args: Params) {
         });
       }
     } catch (error) {
-      return createSuccessResponse('Entry unpublish failed', {
-        unpublishedEntries: [],
+      return createSuccessResponse('Asset unpublish failed', {
+        unpublishedAssets: [],
         errors: [{
-          entryId: entryIds[0],
+          assetId: assetIds[0],
           error: error instanceof Error ? error.message : 'Unknown error',
         }],
         summary: {
@@ -93,55 +93,55 @@ async function tool(args: Params) {
     }
   }
 
-  // For multiple entries, use bulk action API
-  // Get the current version of each entry and filter only published ones
-  const entriesToUnpublish: VersionedLink[] = [];
+  // For multiple assets, use bulk action API
+  // Get the current version of each asset and filter only published ones
+  const assetsToUnpublish: VersionedLink[] = [];
   const alreadyUnpublished: Array<{
     id: string;
-    contentType: string;
+    title: string;
     wasPublished: boolean;
   }> = [];
   const errors = [];
 
   await Promise.all(
-    entryIds.map(async (entryId) => {
+    assetIds.map(async (assetId) => {
       try {
-        const currentEntry = await contentfulClient.entry.get({
+        const currentAsset = await contentfulClient.asset.get({
           ...baseParams,
-          entryId,
+          assetId,
         });
 
-        if (currentEntry.sys.publishedVersion !== undefined) {
-          entriesToUnpublish.push({
+        if (currentAsset.sys.publishedVersion !== undefined) {
+          assetsToUnpublish.push({
             sys: {
               type: "Link" as const,
-              linkType: "Entry" as const,
-              id: entryId,
-              version: currentEntry.sys.version,
+              linkType: "Asset" as const,
+              id: assetId,
+              version: currentAsset.sys.version,
             },
           });
         } else {
           alreadyUnpublished.push({
-            id: entryId,
-            contentType: currentEntry.sys.contentType.sys.id,
+            id: assetId,
+            title: currentAsset.fields.title?.["en-US"] || "Untitled",
             wasPublished: false,
           });
         }
       } catch (error) {
         errors.push({
-          entryId,
+          assetId,
           error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }),
   );
 
-  let unpublishedEntries = [...alreadyUnpublished];
+  let unpublishedAssets = [...alreadyUnpublished];
 
-  // Only proceed with bulk action if there are entries to unpublish
-  if (entriesToUnpublish.length > 0) {
+  // Only proceed with bulk action if there are assets to unpublish
+  if (assetsToUnpublish.length > 0) {
     // Create the collection object
-    const entitiesCollection = createEntitiesCollection(entriesToUnpublish);
+    const entitiesCollection = createEntitiesCollection(assetsToUnpublish);
 
     // Create the bulk action
     const bulkAction = await contentfulClient.bulkAction.unpublish(
@@ -161,22 +161,22 @@ async function tool(args: Params) {
     // Process results
     if (action.sys.status === "succeeded" && action.succeeded) {
       for (const succeededItem of action.succeeded) {
-        // Get the unpublished entry details
+        // Get the unpublished asset details
         try {
-          const entry = await contentfulClient.entry.get({
+          const asset = await contentfulClient.asset.get({
             ...baseParams,
-            entryId: succeededItem.sys.id,
+            assetId: succeededItem.sys.id,
           });
           
-          unpublishedEntries.push({
-            id: entry.sys.id,
-            contentType: entry.sys.contentType.sys.id,
+          unpublishedAssets.push({
+            id: asset.sys.id,
+            title: asset.fields.title?.["en-US"] || "Untitled",
             wasPublished: true,
           });
         } catch {
-          unpublishedEntries.push({
+          unpublishedAssets.push({
             id: succeededItem.sys.id,
-            contentType: "Unknown",
+            title: "Unknown",
             wasPublished: true,
           });
         }
@@ -186,7 +186,7 @@ async function tool(args: Params) {
     if (action.failed) {
       for (const failedItem of action.failed) {
         errors.push({
-          entryId: failedItem.sys.id,
+          assetId: failedItem.sys.id,
           error: failedItem.error ? JSON.stringify(failedItem.error) : 'Unknown error',
         });
       }
@@ -194,27 +194,27 @@ async function tool(args: Params) {
 
     // If the entire bulk action failed
     if (action.sys.status === "failed") {
-      for (const entityLink of entriesToUnpublish) {
+      for (const entityLink of assetsToUnpublish) {
         errors.push({
-          entryId: entityLink.sys.id,
+          assetId: entityLink.sys.id,
           error: action.error ? JSON.stringify(action.error) : 'Bulk action failed',
         });
       }
     }
   }
 
-  return createSuccessResponse('Entry(s) unpublished successfully', {
-    unpublishedEntries,
+  return createSuccessResponse('Asset(s) unpublished successfully', {
+    unpublishedAssets,
     errors,
     summary: {
-      total: entryIds.length,
-      successful: unpublishedEntries.length,
+      total: assetIds.length,
+      successful: unpublishedAssets.length,
       failed: errors.length,
     },
   });
 }
 
-export const unpublishEntryTool = withErrorHandling(
+export const unpublishAssetTool = withErrorHandling(
   tool,
-  'Error unpublishing entry',
+  'Error unpublishing asset',
 ); 
