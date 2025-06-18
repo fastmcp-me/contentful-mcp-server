@@ -15,6 +15,22 @@ export const ListAssetsToolParams = BaseToolSchema.extend({
     .number()
     .optional()
     .describe('Skip this many assets for pagination'),
+  select: z
+    .string()
+    .optional()
+    .describe('Comma-separated list of fields to return'),
+  include: z
+    .number()
+    .optional()
+    .describe('Include this many levels of linked entries'),
+  order: z
+    .string()
+    .optional()
+    .describe('Order assets by this field'),
+  links_to_entry: z
+    .string()
+    .optional()
+    .describe('Find assets that link to the specified entry ID'),
 });
 
 type Params = z.infer<typeof ListAssetsToolParams>;
@@ -32,6 +48,10 @@ async function tool(args: Params) {
     query: {
       limit: Math.min(args.limit || 3, 3),
       skip: args.skip || 0,
+      ...(args.select && { select: args.select }),
+      ...(args.include && { include: args.include }),
+      ...(args.order && { order: args.order }),
+      ...(args.links_to_entry && { links_to_entry: args.links_to_entry }),
     },
   });
 

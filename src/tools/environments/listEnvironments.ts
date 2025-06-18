@@ -17,6 +17,14 @@ export const ListEnvironmentsToolParams = BaseToolSchema.extend({
     .number()
     .optional()
     .describe('Skip this many environments for pagination'),
+  select: z
+    .string()
+    .optional()
+    .describe('Comma-separated list of fields to return'),
+  order: z
+    .string()
+    .optional()
+    .describe('Order environments by this field'),
 });
 
 type Params = z.infer<typeof ListEnvironmentsToolParams>;
@@ -35,6 +43,8 @@ async function tool(args: Params) {
     query: {
       limit: Math.min(args.limit || 10, 10),
       skip: args.skip || 0,
+      ...(args.select && { select: args.select }),
+      ...(args.order && { order: args.order }),
     },
   });
 

@@ -17,6 +17,14 @@ export const ListSpacesToolParams = z.object({
     .number()
     .optional()
     .describe('Skip this many spaces for pagination'),
+  select: z
+    .string()
+    .optional()
+    .describe('Comma-separated list of fields to return'),
+  order: z
+    .string()
+    .optional()
+    .describe('Order spaces by this field'),
 });
 
 type Params = z.infer<typeof ListSpacesToolParams>;
@@ -32,6 +40,8 @@ async function tool(args: Params) {
     query: {
       limit: Math.min(args.limit || 10, 10),
       skip: args.skip || 0,
+      ...(args.select && { select: args.select }),
+      ...(args.order && { order: args.order }),
     },
   });
 

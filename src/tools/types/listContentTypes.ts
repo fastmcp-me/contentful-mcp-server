@@ -15,6 +15,18 @@ export const ListContentTypesToolParams = BaseToolSchema.extend({
     .number()
     .optional()
     .describe('Skip this many content types for pagination'),
+  select: z
+    .string()
+    .optional()
+    .describe('Comma-separated list of fields to return'),
+  include: z
+    .number()
+    .optional()
+    .describe('Include this many levels of linked entries'),
+  order: z
+    .string()
+    .optional()
+    .describe('Order content types by this field'),
 });
 
 type Params = z.infer<typeof ListContentTypesToolParams>;
@@ -32,6 +44,9 @@ async function tool(args: Params) {
     query: {
       limit: Math.min(args.limit || 10, 10),
       skip: args.skip || 0,
+      ...(args.select && { select: args.select }),
+      ...(args.include && { include: args.include }),
+      ...(args.order && { order: args.order }),
     },
   });
 
