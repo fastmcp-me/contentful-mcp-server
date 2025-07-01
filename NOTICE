@@ -1,0 +1,69 @@
+This project includes the following third-party open-source software components. Each is provided under its respective license.
+
+Runtime Dependencies (Production)
+
+@modelcontextprotocol/sdk
+    License: MIT
+    https://www.npmjs.com/package/@modelcontextprotocol/sdk [npmjs.com]
+contentful-management
+    License: MIT
+    https://www.npmjs.com/package/contentful-management [npmjs.com]
+dotenv
+    License: BSD-2-Clause
+    https://www.npmjs.com/package/dotenv [npmjs.com]
+fast-xml-parser
+    License: MIT
+    https://www.npmjs.com/package/fast-xml-parser [npmjs.com]
+get-it
+    License: MIT
+    https://www.npmjs.com/package/get-it [npmjs.com]
+gpt-tokenizer
+    License: MIT
+    https://www.npmjs.com/package/gpt-tokenizer [npmjs.com]
+outdent
+    License: MIT
+    https://www.npmjs.com/package/outdent [npmjs.com]
+zod
+    License: MIT
+    https://www.npmjs.com/package/zod [npmjs.com]
+
+
+Development Dependencies
+
+@types/node
+    License: MIT
+    https://www.npmjs.com/package/@types/node [npmjs.com]
+@typescript-eslint/eslint-plugin
+    License: MIT
+    https://www.npmjs.com/package/@typescript-eslint/eslint-plugin [npmjs.com]
+eslint-plugin-simple-import-sort
+    License: MIT
+    https://www.npmjs.com/package/eslint-plugin-simple-import-sort [npmjs.com]
+eslint-plugin-unused-imports
+    License: MIT
+    https://www.npmjs.com/package/eslint-plugin-unused-imports [npmjs.com]
+mcps-logger
+    License: MIT (assumed – to be confirmed by license file)
+    https://www.npmjs.com/package/mcps-logger [npmjs.com]
+nodemon
+    License: MIT
+    https://www.npmjs.com/package/nodemon [npmjs.com]
+prettier
+    License: MIT
+    https://www.npmjs.com/package/prettier [npmjs.com]
+ts-node
+    License: MIT
+    https://www.npmjs.com/package/ts-node [npmjs.com]
+typescript
+    License: Apache-2.0
+    https://www.npmjs.com/package/typescript [npmjs.com]
+vitest
+    License: MIT
+    https://www.npmjs.com/package/vitest [npmjs.com]
+
+
+Each component is used in accordance with its open-source license. The
+applicable license texts are included in this repository under the
+licenses/ directory.
+
+For more details, please refer to the LICENSE file for this project. 
