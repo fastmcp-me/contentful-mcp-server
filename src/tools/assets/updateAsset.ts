@@ -7,7 +7,11 @@ import { BaseToolSchema, createToolClient } from '../../utils/tools.js';
 
 export const UpdateAssetToolParams = BaseToolSchema.extend({
   assetId: z.string().describe('The ID of the asset to update'),
-  fields: z.record(z.any()).describe('The field values to update. Keys should be field IDs and values should be the field content. Will be merged with existing fields.'),
+  fields: z
+    .record(z.any())
+    .describe(
+      'The field values to update. Keys should be field IDs and values should be the field content. Will be merged with existing fields.',
+    ),
 });
 
 type Params = z.infer<typeof UpdateAssetToolParams>;
@@ -31,7 +35,4 @@ async function tool(args: Params) {
   return createSuccessResponse('Asset updated successfully', { updatedAsset });
 }
 
-export const updateAssetTool = withErrorHandling(
-  tool,
-  'Error updating asset',
-); 
+export const updateAssetTool = withErrorHandling(tool, 'Error updating asset');

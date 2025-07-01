@@ -11,10 +11,7 @@ export const ListAssetsToolParams = BaseToolSchema.extend({
     .number()
     .optional()
     .describe('Maximum number of assets to return (max 3)'),
-  skip: z
-    .number()
-    .optional()
-    .describe('Skip this many assets for pagination'),
+  skip: z.number().optional().describe('Skip this many assets for pagination'),
   select: z
     .string()
     .optional()
@@ -23,10 +20,7 @@ export const ListAssetsToolParams = BaseToolSchema.extend({
     .number()
     .optional()
     .describe('Include this many levels of linked entries'),
-  order: z
-    .string()
-    .optional()
-    .describe('Order assets by this field'),
+  order: z.string().optional().describe('Order assets by this field'),
   links_to_entry: z
     .string()
     .optional()
@@ -55,14 +49,14 @@ async function tool(args: Params) {
     },
   });
 
-  const summarizedAssets = assets.items.map(asset => ({
+  const summarizedAssets = assets.items.map((asset) => ({
     id: asset.sys.id,
-    title: asset.fields.title?.["en-US"] || "Untitled",
-    description: asset.fields.description?.["en-US"] || null,
-    fileName: asset.fields.file?.["en-US"]?.fileName || null,
-    contentType: asset.fields.file?.["en-US"]?.contentType || null,
-    url: asset.fields.file?.["en-US"]?.url || null,
-    size: asset.fields.file?.["en-US"]?.details?.size || null,
+    title: asset.fields.title?.['en-US'] || 'Untitled',
+    description: asset.fields.description?.['en-US'] || null,
+    fileName: asset.fields.file?.['en-US']?.fileName || null,
+    contentType: asset.fields.file?.['en-US']?.contentType || null,
+    url: asset.fields.file?.['en-US']?.url || null,
+    size: asset.fields.file?.['en-US']?.details?.size || null,
     createdAt: asset.sys.createdAt,
     updatedAt: asset.sys.updatedAt,
     publishedVersion: asset.sys.publishedVersion,
@@ -77,7 +71,7 @@ async function tool(args: Params) {
       maxItems: 3,
       remainingMessage:
         'To see more assets, please ask me to retrieve the next page using the skip parameter.',
-    }
+    },
   );
 
   return createSuccessResponse('Assets retrieved successfully', {
@@ -88,7 +82,4 @@ async function tool(args: Params) {
   });
 }
 
-export const listAssetsTool = withErrorHandling(
-  tool,
-  'Error listing assets',
-); 
+export const listAssetsTool = withErrorHandling(tool, 'Error listing assets');

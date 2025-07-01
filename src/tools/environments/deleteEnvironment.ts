@@ -22,11 +22,12 @@ async function tool(args: Params) {
   // Delete the environment
   await contentfulClient.environment.delete(params);
 
-  return createSuccessResponse('Environment deleted successfully', 
-    { environmentId: args.environmentId });
+  return createSuccessResponse('Environment deleted successfully', {
+    environmentId: args.environmentId,
+  });
 }
 
 export const deleteEnvironmentTool = withErrorHandling(
   tool,
   'Error deleting environment',
-); 
+);

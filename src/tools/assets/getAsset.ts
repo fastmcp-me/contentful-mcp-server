@@ -26,7 +26,4 @@ async function tool(args: Params) {
   return createSuccessResponse('Asset retrieved successfully', { asset });
 }
 
-export const getAssetTool = withErrorHandling(
-  tool,
-  'Error retrieving asset',
-); 
+export const getAssetTool = withErrorHandling(tool, 'Error retrieving asset');

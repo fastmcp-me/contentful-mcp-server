@@ -19,17 +19,19 @@ async function tool(args: Params) {
   const environment = await contentfulClient.environment.createWithId(
     {
       spaceId: args.spaceId,
-      environmentId: args.environmentId
+      environmentId: args.environmentId,
     },
     {
       name: args.name,
-    }
+    },
   );
 
-  return createSuccessResponse('Environment created successfully', { environment });
+  return createSuccessResponse('Environment created successfully', {
+    environment,
+  });
 }
 
 export const createEnvironmentTool = withErrorHandling(
   tool,
   'Error creating environment',
-); 
+);

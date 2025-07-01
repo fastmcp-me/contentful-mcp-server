@@ -30,9 +30,9 @@ async function tool(args: Params) {
   // Prepare asset properties following Contentful's structure
   const assetProps = {
     fields: {
-      title: { "en-US": args.title },
-      description: args.description ? { "en-US": args.description } : undefined,
-      file: { "en-US": args.file },
+      title: { 'en-US': args.title },
+      description: args.description ? { 'en-US': args.description } : undefined,
+      file: { 'en-US': args.file },
     },
   };
 
@@ -49,12 +49,9 @@ async function tool(args: Params) {
     {},
   );
 
-  return createSuccessResponse('Asset uploaded successfully', { 
-    asset: processedAsset 
+  return createSuccessResponse('Asset uploaded successfully', {
+    asset: processedAsset,
   });
 }
 
-export const uploadAssetTool = withErrorHandling(
-  tool,
-  'Error uploading asset',
-); 
+export const uploadAssetTool = withErrorHandling(tool, 'Error uploading asset');

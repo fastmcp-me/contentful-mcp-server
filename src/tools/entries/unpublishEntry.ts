@@ -1,96 +1,97 @@
 import { z } from 'zod';
 import {
-    createSuccessResponse,
-    withErrorHandling,
+  createSuccessResponse,
+  withErrorHandling,
 } from '../../utils/response.js';
-import {BaseToolSchema, createToolClient } from '../../utils/tools.js';
+import { BaseToolSchema, createToolClient } from '../../utils/tools.js';
 import {
-    BulkOperationParams,
-    createEntryUnversionedLinks,
-    createEntitiesCollection,
-    waitForBulkActionCompletion,
+  BulkOperationParams,
+  createEntryUnversionedLinks,
+  createEntitiesCollection,
+  waitForBulkActionCompletion,
 } from '../../utils/bulkOperations.js';
 
 export const UnpublishEntryToolParams = BaseToolSchema.extend({
-    entryId: z.union([
-        z.string(),
-        z.array(z.string()).max(100)
-    ]).describe('The ID of the entry to unpublish (string) or an array of entry IDs (up to 100 entries)'),
+  entryId: z
+    .union([z.string(), z.array(z.string()).max(100)])
+    .describe(
+      'The ID of the entry to unpublish (string) or an array of entry IDs (up to 100 entries)',
+    ),
 });
 
 type Params = z.infer<typeof UnpublishEntryToolParams>;
 
 async function tool(args: Params) {
-    const baseParams: BulkOperationParams = {
-        spaceId: args.spaceId,
-        environmentId: args.environmentId,
-    };
+  const baseParams: BulkOperationParams = {
+    spaceId: args.spaceId,
+    environmentId: args.environmentId,
+  };
 
-    const contentfulClient = createToolClient(args);
+  const contentfulClient = createToolClient(args);
 
-    // Normalize input to always be an array
-    const entryIds = Array.isArray(args.entryId) ? args.entryId : [args.entryId];
-    
-    // For single entry, use individual publish for simplicity
-    if (entryIds.length === 1) {
-        try {
-            const entryId = entryIds[0];
-            const params = {
-                ...baseParams,
-                entryId,
-            };
+  // Normalize input to always be an array
+  const entryIds = Array.isArray(args.entryId) ? args.entryId : [args.entryId];
 
-            // Get the entry first
-            const entry = await contentfulClient.entry.get(params);
-            
-            // Unpublish the entry
-            const unpublishedEntry = await contentfulClient.entry.unpublish(params, entry);
-            
-            return createSuccessResponse('Entry unpublished successfully', {
-                status: unpublishedEntry.sys.status,
-                entryId,
-            });
-        } catch (error) {
-            return createSuccessResponse('Entry unpublish failed', {
-                status: error,
-                entryId: entryIds[0],
-            });
-        }
+  // For single entry, use individual publish for simplicity
+  if (entryIds.length === 1) {
+    try {
+      const entryId = entryIds[0];
+      const params = {
+        ...baseParams,
+        entryId,
+      };
+
+      // Get the entry first
+      const entry = await contentfulClient.entry.get(params);
+
+      // Unpublish the entry
+      const unpublishedEntry = await contentfulClient.entry.unpublish(
+        params,
+        entry,
+      );
+
+      return createSuccessResponse('Entry unpublished successfully', {
+        status: unpublishedEntry.sys.status,
+        entryId,
+      });
+    } catch (error) {
+      return createSuccessResponse('Entry unpublish failed', {
+        status: error,
+        entryId: entryIds[0],
+      });
     }
+  }
 
-    // For multiple entries, use bulk action API
-    // Get the unversioned links for each entry (unpublish doesn't need version info)
-    const entityLinks = await createEntryUnversionedLinks(
-        contentfulClient,
-        baseParams,
-        entryIds
-    );
+  // For multiple entries, use bulk action API
+  // Get the unversioned links for each entry (unpublish doesn't need version info)
+  const entityLinks = await createEntryUnversionedLinks(
+    contentfulClient,
+    baseParams,
+    entryIds,
+  );
 
-    // Create the collection object
-    const entitiesCollection = createEntitiesCollection(entityLinks);
+  // Create the collection object
+  const entitiesCollection = createEntitiesCollection(entityLinks);
 
-    // Create the bulk action
-    const bulkAction = await contentfulClient.bulkAction.unpublish(
-        baseParams,
-        {
-            entities: entitiesCollection,
-        },
-    );
+  // Create the bulk action
+  const bulkAction = await contentfulClient.bulkAction.unpublish(baseParams, {
+    entities: entitiesCollection,
+  });
 
-    // Wait for the bulk action to complete
-    const action = await waitForBulkActionCompletion(
-        contentfulClient,
-        baseParams,
-        bulkAction.sys.id
-    );
+  // Wait for the bulk action to complete
+  const action = await waitForBulkActionCompletion(
+    contentfulClient,
+    baseParams,
+    bulkAction.sys.id,
+  );
 
-    return createSuccessResponse('Entry(s) unpublished successfully', {
-        status: action.sys.status,
-        entryIds,
-    });
+  return createSuccessResponse('Entry(s) unpublished successfully', {
+    status: action.sys.status,
+    entryIds,
+  });
 }
 
 export const unpublishEntryTool = withErrorHandling(
-    tool,
-    'Error unpublishing entry',
+  tool,
+  'Error unpublishing entry',
 );

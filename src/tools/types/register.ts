@@ -1,11 +1,32 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { getContentTypeTool, GetContentTypeToolParams } from './getContentType.js';
-import { listContentTypesTool, ListContentTypesToolParams } from './listContentTypes.js';
-import { createContentTypeTool, CreateContentTypeToolParams } from './createContentType.js';
-import { updateContentTypeTool, UpdateContentTypeToolParams } from './updateContentType.js';
-import { deleteContentTypeTool, DeleteContentTypeToolParams } from './deleteContentType.js';
-import { publishContentTypeTool, PublishContentTypeToolParams } from './publishContentType.js';
-import { unpublishContentTypeTool, UnpublishContentTypeToolParams } from './unpublishContentType.js';
+import {
+  getContentTypeTool,
+  GetContentTypeToolParams,
+} from './getContentType.js';
+import {
+  listContentTypesTool,
+  ListContentTypesToolParams,
+} from './listContentTypes.js';
+import {
+  createContentTypeTool,
+  CreateContentTypeToolParams,
+} from './createContentType.js';
+import {
+  updateContentTypeTool,
+  UpdateContentTypeToolParams,
+} from './updateContentType.js';
+import {
+  deleteContentTypeTool,
+  DeleteContentTypeToolParams,
+} from './deleteContentType.js';
+import {
+  publishContentTypeTool,
+  PublishContentTypeToolParams,
+} from './publishContentType.js';
+import {
+  unpublishContentTypeTool,
+  UnpublishContentTypeToolParams,
+} from './unpublishContentType.js';
 
 export function registerContentTypesTools(server: McpServer) {
   server.tool(
@@ -14,7 +35,7 @@ export function registerContentTypesTools(server: McpServer) {
     GetContentTypeToolParams.shape,
     getContentTypeTool,
   );
-  
+
   server.tool(
     'list_content_types',
     'List content types in a space. Returns a maximum of 10 items per request. Use skip parameter to paginate through results.',
@@ -56,4 +77,4 @@ export function registerContentTypesTools(server: McpServer) {
     UnpublishContentTypeToolParams.shape,
     unpublishContentTypeTool,
   );
-} 
+}

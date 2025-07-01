@@ -24,13 +24,17 @@ async function tool(args: Params) {
   const currentContentType = await contentfulClient.contentType.get(params);
 
   // Publish the content type
-  const contentType = await contentfulClient.contentType.publish(params, currentContentType);
+  const contentType = await contentfulClient.contentType.publish(
+    params,
+    currentContentType,
+  );
 
-  return createSuccessResponse('Content type published successfully', 
-    { contentType });
+  return createSuccessResponse('Content type published successfully', {
+    contentType,
+  });
 }
 
 export const publishContentTypeTool = withErrorHandling(
   tool,
   'Error publishing content type',
-); 
+);

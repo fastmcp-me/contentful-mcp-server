@@ -23,11 +23,12 @@ async function tool(args: Params) {
   // Unpublish the content type
   const contentType = await contentfulClient.contentType.unpublish(params);
 
-  return createSuccessResponse('Content type unpublished successfully', 
-    { contentType });
+  return createSuccessResponse('Content type unpublished successfully', {
+    contentType,
+  });
 }
 
 export const unpublishContentTypeTool = withErrorHandling(
   tool,
   'Error unpublishing content type',
-); 
+);

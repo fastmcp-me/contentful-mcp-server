@@ -3,66 +3,69 @@ import type { PlainClientAPI } from 'contentful-management';
 
 export interface VersionedLink {
   sys: {
-    type: "Link"
-    linkType: "Entry" | "Asset"
-    id: string
-    version: number
-  }
+    type: 'Link';
+    linkType: 'Entry' | 'Asset';
+    id: string;
+    version: number;
+  };
 }
 
 export interface UnversionedLink {
   sys: {
-    type: "Link"
-    linkType: "Entry" | "Asset"
-    id: string
-  }
+    type: 'Link';
+    linkType: 'Entry' | 'Asset';
+    id: string;
+  };
 }
 
 export interface Collection<T> {
   sys: {
-    type: "Array"
-  }
-  items: T[]
+    type: 'Array';
+  };
+  items: T[];
 }
 
 export interface BulkActionResponse {
   sys: {
-    id: string
-    status: string
-  }
+    id: string;
+    status: string;
+  };
   succeeded?: Array<{
     sys: {
-      id: string
-      type: string
-    }
-  }>
+      id: string;
+      type: string;
+    };
+  }>;
   failed?: Array<{
     sys: {
-      id: string
-      type: string
-    }
-    error?: unknown
-  }>
-  error?: unknown
+      id: string;
+      type: string;
+    };
+    error?: unknown;
+  }>;
+  error?: unknown;
 }
 
 export interface BulkOperationParams {
-  spaceId: string
-  environmentId: string
+  spaceId: string;
+  environmentId: string;
 }
 
 // Helper function to wait for bulk action completion
 export async function waitForBulkActionCompletion(
   contentfulClient: PlainClientAPI,
   baseParams: BulkOperationParams,
-  bulkActionId: string
+  bulkActionId: string,
 ): Promise<BulkActionResponse> {
   let action = (await contentfulClient.bulkAction.get({
     ...baseParams,
     bulkActionId,
   })) as unknown as BulkActionResponse;
 
-  while (action.sys.status === "inProgress" || action.sys.status === "created") {
+  while (
+    action.sys.status === 'inProgress' ||
+    action.sys.status === 'created'
+  ) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     action = (await contentfulClient.bulkAction.get({
       ...baseParams,
@@ -77,7 +80,7 @@ export async function waitForBulkActionCompletion(
 export async function createEntryVersionedLinks(
   contentfulClient: PlainClientAPI,
   baseParams: BulkOperationParams,
-  entryIds: string[]
+  entryIds: string[],
 ): Promise<VersionedLink[]> {
   return Promise.all(
     entryIds.map(async (entryId) => {
@@ -88,13 +91,13 @@ export async function createEntryVersionedLinks(
 
       return {
         sys: {
-          type: "Link" as const,
-          linkType: "Entry" as const,
+          type: 'Link' as const,
+          linkType: 'Entry' as const,
           id: entryId,
           version: currentEntry.sys.version,
         },
       };
-    })
+    }),
   );
 }
 
@@ -102,7 +105,7 @@ export async function createEntryVersionedLinks(
 export async function createEntryUnversionedLinks(
   contentfulClient: PlainClientAPI,
   baseParams: BulkOperationParams,
-  entryIds: string[]
+  entryIds: string[],
 ): Promise<UnversionedLink[]> {
   // For unpublish operations, we don't need to fetch entries since we only need IDs
   // But we should validate they exist first
@@ -112,13 +115,13 @@ export async function createEntryUnversionedLinks(
         ...baseParams,
         entryId,
       });
-    })
+    }),
   );
 
   return entryIds.map((entryId) => ({
     sys: {
-      type: "Link" as const,
-      linkType: "Entry" as const,
+      type: 'Link' as const,
+      linkType: 'Entry' as const,
       id: entryId,
     },
   }));
@@ -128,7 +131,7 @@ export async function createEntryUnversionedLinks(
 export async function createAssetVersionedLinks(
   contentfulClient: PlainClientAPI,
   baseParams: BulkOperationParams,
-  assetIds: string[]
+  assetIds: string[],
 ): Promise<VersionedLink[]> {
   return Promise.all(
     assetIds.map(async (assetId) => {
@@ -139,13 +142,13 @@ export async function createAssetVersionedLinks(
 
       return {
         sys: {
-          type: "Link" as const,
-          linkType: "Asset" as const,
+          type: 'Link' as const,
+          linkType: 'Asset' as const,
           id: assetId,
           version: currentAsset.sys.version,
         },
       };
-    })
+    }),
   );
 }
 
@@ -153,7 +156,7 @@ export async function createAssetVersionedLinks(
 export async function createAssetUnversionedLinks(
   contentfulClient: PlainClientAPI,
   baseParams: BulkOperationParams,
-  assetIds: string[]
+  assetIds: string[],
 ): Promise<UnversionedLink[]> {
   // For unpublish operations, we don't need to fetch assets since we only need IDs
   // But we should validate they exist first
@@ -163,26 +166,32 @@ export async function createAssetUnversionedLinks(
         ...baseParams,
         assetId,
       });
-    })
+    }),
   );
 
   return assetIds.map((assetId) => ({
     sys: {
-      type: "Link" as const,
-      linkType: "Asset" as const,
+      type: 'Link' as const,
+      linkType: 'Asset' as const,
       id: assetId,
     },
   }));
 }
 
 // Helper function to create collection from versioned links
-export function createEntitiesCollection(entities: VersionedLink[]): Collection<VersionedLink>;
-export function createEntitiesCollection(entities: UnversionedLink[]): Collection<UnversionedLink>;
-export function createEntitiesCollection(entities: VersionedLink[] | UnversionedLink[]): Collection<VersionedLink | UnversionedLink> {
+export function createEntitiesCollection(
+  entities: VersionedLink[],
+): Collection<VersionedLink>;
+export function createEntitiesCollection(
+  entities: UnversionedLink[],
+): Collection<UnversionedLink>;
+export function createEntitiesCollection(
+  entities: VersionedLink[] | UnversionedLink[],
+): Collection<VersionedLink | UnversionedLink> {
   return {
     sys: {
-      type: "Array",
+      type: 'Array',
     },
     items: entities,
   };
-} 
+}

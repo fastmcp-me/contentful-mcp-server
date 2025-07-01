@@ -27,7 +27,4 @@ async function tool(args: Params) {
   return createSuccessResponse('Space retrieved successfully', { space });
 }
 
-export const getSpaceTool = withErrorHandling(
-  tool,
-  'Error retrieving space',
-); 
+export const getSpaceTool = withErrorHandling(tool, 'Error retrieving space');

@@ -1,11 +1,14 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { uploadAssetTool, UploadAssetToolParams } from './uploadAsset.js';
 import { listAssetsTool, ListAssetsToolParams } from './listAssets.js';
 import { getAssetTool, GetAssetToolParams } from './getAsset.js';
 import { updateAssetTool, UpdateAssetToolParams } from './updateAsset.js';
 import { deleteAssetTool, DeleteAssetToolParams } from './deleteAsset.js';
 import { publishAssetTool, PublishAssetToolParams } from './publishAsset.js';
-import { unpublishAssetTool, UnpublishAssetToolParams } from './unpublishAsset.js';
+import {
+  unpublishAssetTool,
+  UnpublishAssetToolParams,
+} from './unpublishAsset.js';
 
 export function registerAssetTools(server: McpServer) {
   server.tool(

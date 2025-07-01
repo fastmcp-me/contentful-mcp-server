@@ -13,18 +13,12 @@ export const ListSpacesToolParams = z.object({
     .number()
     .optional()
     .describe('Maximum number of spaces to return (max 10)'),
-  skip: z
-    .number()
-    .optional()
-    .describe('Skip this many spaces for pagination'),
+  skip: z.number().optional().describe('Skip this many spaces for pagination'),
   select: z
     .string()
     .optional()
     .describe('Comma-separated list of fields to return'),
-  order: z
-    .string()
-    .optional()
-    .describe('Order spaces by this field'),
+  order: z.string().optional().describe('Order spaces by this field'),
 });
 
 type Params = z.infer<typeof ListSpacesToolParams>;
@@ -45,7 +39,7 @@ async function tool(args: Params) {
     },
   });
 
-  const summarizedSpaces = spaces.items.map(space => ({
+  const summarizedSpaces = spaces.items.map((space) => ({
     id: space.sys.id,
     name: space.name,
     createdAt: space.sys.createdAt,
@@ -61,7 +55,7 @@ async function tool(args: Params) {
       maxItems: 10,
       remainingMessage:
         'To see more spaces, please ask me to retrieve the next page using the skip parameter.',
-    }
+    },
   );
 
   return createSuccessResponse('Spaces retrieved successfully', {
@@ -72,7 +66,4 @@ async function tool(args: Params) {
   });
 }
 
-export const listSpacesTool = withErrorHandling(
-  tool,
-  'Error listing spaces',
-); 
+export const listSpacesTool = withErrorHandling(tool, 'Error listing spaces');

@@ -26,7 +26,4 @@ async function tool(args: Params) {
   return createSuccessResponse('Entry retrieved successfully', { entry });
 }
 
-export const getEntryTool = withErrorHandling(
-  tool,
-  'Error retrieving entry',
-); 
+export const getEntryTool = withErrorHandling(tool, 'Error retrieving entry');

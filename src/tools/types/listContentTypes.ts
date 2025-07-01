@@ -23,10 +23,7 @@ export const ListContentTypesToolParams = BaseToolSchema.extend({
     .number()
     .optional()
     .describe('Include this many levels of linked entries'),
-  order: z
-    .string()
-    .optional()
-    .describe('Order content types by this field'),
+  order: z.string().optional().describe('Order content types by this field'),
 });
 
 type Params = z.infer<typeof ListContentTypesToolParams>;
@@ -50,10 +47,10 @@ async function tool(args: Params) {
     },
   });
 
-  const summarizedContentTypes = contentTypes.items.map(contentType => ({
+  const summarizedContentTypes = contentTypes.items.map((contentType) => ({
     ...contentType,
-    id : contentType.sys.id,
-    fieldsCount: contentType.fields.length 
+    id: contentType.sys.id,
+    fieldsCount: contentType.fields.length,
   }));
 
   const summarized = summarizeData(
@@ -65,7 +62,7 @@ async function tool(args: Params) {
       maxItems: 10,
       remainingMessage:
         'To see more content types, please ask me to retrieve the next page using the skip parameter.',
-    }
+    },
   );
 
   return createSuccessResponse('Content types retrieved successfully', {
@@ -79,4 +76,4 @@ async function tool(args: Params) {
 export const listContentTypesTool = withErrorHandling(
   tool,
   'Error listing content types',
-); 
+);

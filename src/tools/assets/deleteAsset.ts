@@ -29,7 +29,4 @@ async function tool(args: Params) {
   return createSuccessResponse('Asset deleted successfully', { asset });
 }
 
-export const deleteAssetTool = withErrorHandling(
-  tool,
-  'Error deleting asset',
-); 
+export const deleteAssetTool = withErrorHandling(tool, 'Error deleting asset');

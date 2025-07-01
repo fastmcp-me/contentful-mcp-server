@@ -23,7 +23,6 @@ async function tool(args: Params) {
   // First, get the entry to check its status
   const entry = await contentfulClient.entry.get(params);
 
-
   // Delete the entry
   await contentfulClient.entry.delete(params);
 
@@ -31,7 +30,4 @@ async function tool(args: Params) {
   return createSuccessResponse('Entry deleted successfully', { entry });
 }
 
-export const deleteEntryTool = withErrorHandling(
-  tool,
-  'Error deleting entry',
-); 
+export const deleteEntryTool = withErrorHandling(tool, 'Error deleting entry');

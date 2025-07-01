@@ -12,10 +12,11 @@ import {
 } from '../../utils/bulkOperations.js';
 
 export const PublishAssetToolParams = BaseToolSchema.extend({
-  assetId: z.union([
-    z.string(),
-    z.array(z.string()).max(100)
-  ]).describe('The ID of the asset to publish (string) or an array of asset IDs (up to 100 assets)'),
+  assetId: z
+    .union([z.string(), z.array(z.string()).max(100)])
+    .describe(
+      'The ID of the asset to publish (string) or an array of asset IDs (up to 100 assets)',
+    ),
 });
 
 type Params = z.infer<typeof PublishAssetToolParams>;
@@ -30,7 +31,7 @@ async function tool(args: Params) {
 
   // Normalize input to always be an array
   const assetIds = Array.isArray(args.assetId) ? args.assetId : [args.assetId];
-  
+
   // For single asset, use individual publish
   if (assetIds.length === 1) {
     try {
@@ -42,10 +43,13 @@ async function tool(args: Params) {
 
       // Get the asset first
       const asset = await contentfulClient.asset.get(params);
-      
+
       // Publish the asset
-      const publishedAsset = await contentfulClient.asset.publish(params, asset);
-      
+      const publishedAsset = await contentfulClient.asset.publish(
+        params,
+        asset,
+      );
+
       return createSuccessResponse('Asset published successfully', {
         status: publishedAsset.sys.status,
         assetId,
@@ -63,25 +67,22 @@ async function tool(args: Params) {
   const entityVersions = await createAssetVersionedLinks(
     contentfulClient,
     baseParams,
-    assetIds
+    assetIds,
   );
 
   // Create the collection object
   const entitiesCollection = createEntitiesCollection(entityVersions);
 
   // Create the bulk action
-  const bulkAction = await contentfulClient.bulkAction.publish(
-    baseParams,
-    {
-      entities: entitiesCollection,
-    },
-  );
+  const bulkAction = await contentfulClient.bulkAction.publish(baseParams, {
+    entities: entitiesCollection,
+  });
 
   // Wait for the bulk action to complete
   const action = await waitForBulkActionCompletion(
     contentfulClient,
     baseParams,
-    bulkAction.sys.id
+    bulkAction.sys.id,
   );
 
   return createSuccessResponse('Asset(s) published successfully', {
@@ -93,4 +94,4 @@ async function tool(args: Params) {
 export const publishAssetTool = withErrorHandling(
   tool,
   'Error publishing asset',
-); 
+);

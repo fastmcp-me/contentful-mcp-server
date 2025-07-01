@@ -23,11 +23,12 @@ async function tool(args: Params) {
   // Delete the content type
   await contentfulClient.contentType.delete(params);
 
-  return createSuccessResponse('Content type deleted successfully', 
-    { contentTypeId: args.contentTypeId });
+  return createSuccessResponse('Content type deleted successfully', {
+    contentTypeId: args.contentTypeId,
+  });
 }
 
 export const deleteContentTypeTool = withErrorHandling(
   tool,
   'Error deleting content type',
-); 
+);

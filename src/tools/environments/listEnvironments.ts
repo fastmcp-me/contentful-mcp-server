@@ -8,7 +8,12 @@ import { summarizeData } from '../../utils/summarizer.js';
 
 // Extend BaseToolSchema but make environmentId optional since it's not needed for listing
 export const ListEnvironmentsToolParams = BaseToolSchema.extend({
-  environmentId: z.string().optional().describe('The ID of the Contentful environment (not required for listing)'),
+  environmentId: z
+    .string()
+    .optional()
+    .describe(
+      'The ID of the Contentful environment (not required for listing)',
+    ),
   limit: z
     .number()
     .optional()
@@ -21,10 +26,7 @@ export const ListEnvironmentsToolParams = BaseToolSchema.extend({
     .string()
     .optional()
     .describe('Comma-separated list of fields to return'),
-  order: z
-    .string()
-    .optional()
-    .describe('Order environments by this field'),
+  order: z.string().optional().describe('Order environments by this field'),
 });
 
 type Params = z.infer<typeof ListEnvironmentsToolParams>;
@@ -35,7 +37,7 @@ async function tool(args: Params) {
     spaceId: args.spaceId,
     environmentId: args.environmentId || 'master',
   };
-  
+
   const contentfulClient = createToolClient(clientArgs);
 
   const environments = await contentfulClient.environment.getMany({
@@ -48,7 +50,7 @@ async function tool(args: Params) {
     },
   });
 
-  const summarizedEnvironments = environments.items.map(environment => ({
+  const summarizedEnvironments = environments.items.map((environment) => ({
     id: environment.sys.id,
     name: environment.name,
     status: environment.sys.status?.sys?.id || 'unknown',
@@ -65,7 +67,7 @@ async function tool(args: Params) {
       maxItems: 10,
       remainingMessage:
         'To see more environments, please ask me to retrieve the next page using the skip parameter.',
-    }
+    },
   );
 
   return createSuccessResponse('Environments retrieved successfully', {
@@ -79,4 +81,4 @@ async function tool(args: Params) {
 export const listEnvironmentsTool = withErrorHandling(
   tool,
   'Error listing environments',
-); 
+);

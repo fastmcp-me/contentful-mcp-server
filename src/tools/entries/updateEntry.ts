@@ -7,7 +7,11 @@ import { BaseToolSchema, createToolClient } from '../../utils/tools.js';
 
 export const UpdateEntryToolParams = BaseToolSchema.extend({
   entryId: z.string().describe('The ID of the entry to update'),
-  fields: z.record(z.any()).describe('The field values to update. Keys should be field IDs and values should be the field content. Will be merged with existing fields.'),
+  fields: z
+    .record(z.any())
+    .describe(
+      'The field values to update. Keys should be field IDs and values should be the field content. Will be merged with existing fields.',
+    ),
 });
 
 type Params = z.infer<typeof UpdateEntryToolParams>;
@@ -31,19 +35,13 @@ async function tool(args: Params) {
   };
 
   // Update the entry with merged fields
-  const updatedEntry = await contentfulClient.entry.update(
-    params,
-    {
-      ...existingEntry,
-      fields: mergedFields,
-    }
-  );
+  const updatedEntry = await contentfulClient.entry.update(params, {
+    ...existingEntry,
+    fields: mergedFields,
+  });
 
   //return info about the entry that was updated
   return createSuccessResponse('Entry updated successfully', { updatedEntry });
 }
 
-export const updateEntryTool = withErrorHandling(
-  tool,
-  'Error updating entry',
-); 
+export const updateEntryTool = withErrorHandling(tool, 'Error updating entry');

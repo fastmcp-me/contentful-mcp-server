@@ -6,7 +6,9 @@ import {
 import { BaseToolSchema, createToolClient } from '../../utils/tools.js';
 
 export const GetContentTypeToolParams = BaseToolSchema.extend({
-  contentTypeId: z.string().describe('The ID of the content type to retrieve details for'),
+  contentTypeId: z
+    .string()
+    .describe('The ID of the content type to retrieve details for'),
 });
 
 type Params = z.infer<typeof GetContentTypeToolParams>;
@@ -25,11 +27,12 @@ async function tool(args: Params) {
     contentTypeId: args.contentTypeId,
   });
 
-  return createSuccessResponse('Content type retrieved successfully', 
-    { contentType });
+  return createSuccessResponse('Content type retrieved successfully', {
+    contentType,
+  });
 }
 
 export const getContentTypeTool = withErrorHandling(
   tool,
   'Error retrieving content type',
-); 
+);
