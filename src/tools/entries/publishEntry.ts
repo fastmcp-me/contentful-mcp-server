@@ -47,30 +47,13 @@ async function tool(args: Params) {
             const publishedEntry = await contentfulClient.entry.publish(params, entry);
             
             return createSuccessResponse('Entry published successfully', {
-                publishedEntries: [{
-                    id: publishedEntry.sys.id,
-                    contentType: publishedEntry.sys.contentType.sys.id,
-                    publishedVersion: publishedEntry.sys.publishedVersion,
-                }],
-                errors: [],
-                summary: {
-                    total: 1,
-                    successful: 1,
-                    failed: 0,
-                },
+                status: publishedEntry.sys.status,
+                entryId,
             });
         } catch (error) {
             return createSuccessResponse('Entry publish failed', {
-                publishedEntries: [],
-                errors: [{
-                    entryId: entryIds[0],
-                    error: error instanceof Error ? error.message : 'Unknown error',
-                }],
-                summary: {
-                    total: 1,
-                    successful: 0,
-                    failed: 1,
-                },
+                status: error,
+                entryId: entryIds[0],
             });
         }
     }
@@ -101,61 +84,9 @@ async function tool(args: Params) {
         bulkAction.sys.id
     );
 
-    // Process results
-    const publishedEntries = [];
-    const errors = [];
-
-    if (action.sys.status === "succeeded" && action.succeeded) {
-        for (const succeededItem of action.succeeded) {
-            // Get the published entry details
-            try {
-                const entry = await contentfulClient.entry.get({
-                    ...baseParams,
-                    entryId: succeededItem.sys.id,
-                });
-                
-                publishedEntries.push({
-                    id: entry.sys.id,
-                    contentType: entry.sys.contentType.sys.id,
-                    publishedVersion: entry.sys.publishedVersion,
-                });
-            } catch {
-                publishedEntries.push({
-                    id: succeededItem.sys.id,
-                    contentType: "Unknown",
-                    publishedVersion: undefined,
-                });
-            }
-        }
-    }
-
-    if (action.failed) {
-        for (const failedItem of action.failed) {
-            errors.push({
-                entryId: failedItem.sys.id,
-                error: failedItem.error ? JSON.stringify(failedItem.error) : 'Unknown error',
-            });
-        }
-    }
-
-    // If the entire bulk action failed
-    if (action.sys.status === "failed") {
-        for (const entryId of entryIds) {
-            errors.push({
-                entryId,
-                error: action.error ? JSON.stringify(action.error) : 'Bulk action failed',
-            });
-        }
-    }
-
     return createSuccessResponse('Entry(s) published successfully', {
-        publishedEntries,
-        errors,
-        summary: {
-            total: entryIds.length,
-            successful: publishedEntries.length,
-            failed: errors.length,
-        },
+        status: action.sys.status,
+        entryIds,
     });
 }
 

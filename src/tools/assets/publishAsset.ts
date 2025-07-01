@@ -47,30 +47,13 @@ async function tool(args: Params) {
       const publishedAsset = await contentfulClient.asset.publish(params, asset);
       
       return createSuccessResponse('Asset published successfully', {
-        publishedAssets: [{
-          id: publishedAsset.sys.id,
-          title: publishedAsset.fields.title?.["en-US"] || "Untitled",
-          publishedVersion: publishedAsset.sys.publishedVersion,
-        }],
-        errors: [],
-        summary: {
-          total: 1,
-          successful: 1,
-          failed: 0,
-        },
+        status: publishedAsset.sys.status,
+        assetId,
       });
     } catch (error) {
       return createSuccessResponse('Asset publish failed', {
-        publishedAssets: [],
-        errors: [{
-          assetId: assetIds[0],
-          error: error instanceof Error ? error.message : 'Unknown error',
-        }],
-        summary: {
-          total: 1,
-          successful: 0,
-          failed: 1,
-        },
+        status: error,
+        assetId: assetIds[0],
       });
     }
   }
@@ -101,61 +84,9 @@ async function tool(args: Params) {
     bulkAction.sys.id
   );
 
-  // Process results
-  const publishedAssets = [];
-  const errors = [];
-
-  if (action.sys.status === "succeeded" && action.succeeded) {
-    for (const succeededItem of action.succeeded) {
-      // Get the published asset details
-      try {
-        const asset = await contentfulClient.asset.get({
-          ...baseParams,
-          assetId: succeededItem.sys.id,
-        });
-        
-        publishedAssets.push({
-          id: asset.sys.id,
-          title: asset.fields.title?.["en-US"] || "Untitled",
-          publishedVersion: asset.sys.publishedVersion,
-        });
-      } catch {
-        publishedAssets.push({
-          id: succeededItem.sys.id,
-          title: "Unknown",
-          publishedVersion: undefined,
-        });
-      }
-    }
-  }
-
-  if (action.failed) {
-    for (const failedItem of action.failed) {
-      errors.push({
-        assetId: failedItem.sys.id,
-        error: failedItem.error ? JSON.stringify(failedItem.error) : 'Unknown error',
-      });
-    }
-  }
-
-  // If the entire bulk action failed
-  if (action.sys.status === "failed") {
-    for (const assetId of assetIds) {
-      errors.push({
-        assetId,
-        error: action.error ? JSON.stringify(action.error) : 'Bulk action failed',
-      });
-    }
-  }
-
   return createSuccessResponse('Asset(s) published successfully', {
-    publishedAssets,
-    errors,
-    summary: {
-      total: assetIds.length,
-      successful: publishedAssets.length,
-      failed: errors.length,
-    },
+    status: action.sys.status,
+    assetIds,
   });
 }
 

@@ -10,6 +10,14 @@ export interface VersionedLink {
   }
 }
 
+export interface UnversionedLink {
+  sys: {
+    type: "Link"
+    linkType: "Entry" | "Asset"
+    id: string
+  }
+}
+
 export interface Collection<T> {
   sys: {
     type: "Array"
@@ -90,6 +98,32 @@ export async function createEntryVersionedLinks(
   );
 }
 
+// Helper function to create unversioned links for entries (used for unpublish operations)
+export async function createEntryUnversionedLinks(
+  contentfulClient: PlainClientAPI,
+  baseParams: BulkOperationParams,
+  entryIds: string[]
+): Promise<UnversionedLink[]> {
+  // For unpublish operations, we don't need to fetch entries since we only need IDs
+  // But we should validate they exist first
+  await Promise.all(
+    entryIds.map(async (entryId) => {
+      await contentfulClient.entry.get({
+        ...baseParams,
+        entryId,
+      });
+    })
+  );
+
+  return entryIds.map((entryId) => ({
+    sys: {
+      type: "Link" as const,
+      linkType: "Entry" as const,
+      id: entryId,
+    },
+  }));
+}
+
 // Helper function to create versioned links for assets
 export async function createAssetVersionedLinks(
   contentfulClient: PlainClientAPI,
@@ -115,8 +149,36 @@ export async function createAssetVersionedLinks(
   );
 }
 
+// Helper function to create unversioned links for assets (used for unpublish operations)
+export async function createAssetUnversionedLinks(
+  contentfulClient: PlainClientAPI,
+  baseParams: BulkOperationParams,
+  assetIds: string[]
+): Promise<UnversionedLink[]> {
+  // For unpublish operations, we don't need to fetch assets since we only need IDs
+  // But we should validate they exist first
+  await Promise.all(
+    assetIds.map(async (assetId) => {
+      await contentfulClient.asset.get({
+        ...baseParams,
+        assetId,
+      });
+    })
+  );
+
+  return assetIds.map((assetId) => ({
+    sys: {
+      type: "Link" as const,
+      linkType: "Asset" as const,
+      id: assetId,
+    },
+  }));
+}
+
 // Helper function to create collection from versioned links
-export function createEntitiesCollection(entities: VersionedLink[]): Collection<VersionedLink> {
+export function createEntitiesCollection(entities: VersionedLink[]): Collection<VersionedLink>;
+export function createEntitiesCollection(entities: UnversionedLink[]): Collection<UnversionedLink>;
+export function createEntitiesCollection(entities: VersionedLink[] | UnversionedLink[]): Collection<VersionedLink | UnversionedLink> {
   return {
     sys: {
       type: "Array",
