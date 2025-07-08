@@ -6,6 +6,7 @@ import { registerEnvironmentTools } from './environments/register.js';
 import { registerAssetTools } from './assets/register.js';
 import { registerSpaceTools } from './spaces/register.js';
 import { registerTagsTools } from './tags/register.js';
+import { registerAiActionsTools } from './ai-actions/register.js';
 
 export function registerAllTools(server: McpServer) {
   registerContextTools(server);
@@ -15,4 +16,5 @@ export function registerAllTools(server: McpServer) {
   registerAssetTools(server);
   registerSpaceTools(server);
   registerTagsTools(server);
+  registerAiActionsTools(server);
 }
