@@ -1,3 +1,9 @@
+## 1.0.2 (2025-07-30)
+
+### 🩹 Fixes
+
+- [PDHD-6691] fix missing user info ([#75](https://github.com/contentful/contentful-mcp-server/pull/75))
+
 ## 1.0.1 (2025-07-30)
 
 ### 🩹 Fixes
