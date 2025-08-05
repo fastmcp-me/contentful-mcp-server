@@ -1,3 +1,9 @@
+## 1.0.3 (2025-08-05)
+
+### 🩹 Fixes
+
+- build path updated in release job [DX-315] ([#86](https://github.com/contentful/contentful-mcp-server/pull/86))
+
 ## 1.0.2 (2025-07-30)
 
 ### 🩹 Fixes
