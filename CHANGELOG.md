@@ -1,3 +1,9 @@
+## 1.0.4 (2025-08-06)
+
+### 🩹 Fixes
+
+- include the build folder in the released package [DX-315] ([#90](https://github.com/contentful/contentful-mcp-server/pull/90))
+
 ## 1.0.3 (2025-08-05)
 
 ### 🩹 Fixes
