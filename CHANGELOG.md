@@ -1,3 +1,9 @@
+## 1.2.1 (2025-08-28)
+
+### 🩹 Fixes
+
+- update zod arrays with actual schema objects for VSCode compatibility ([#126](https://github.com/contentful/contentful-mcp-server/pull/126))
+
 ## 1.2.0 (2025-08-25)
 
 ### 🚀 Features
