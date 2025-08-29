@@ -1,3 +1,9 @@
+## 1.2.2 (2025-08-29)
+
+### 🩹 Fixes
+
+- update install to cursor link in README [DX-356] ([#130](https://github.com/contentful/contentful-mcp-server/pull/130))
+
 ## 1.2.1 (2025-08-28)
 
 ### 🩹 Fixes
